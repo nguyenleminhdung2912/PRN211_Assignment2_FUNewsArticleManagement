@@ -1,0 +1,37 @@
+﻿@{
+    Layout = null; // Đảm bảo không có layout cha
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - News Management</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/NguyenLeMinhDungFall2024RazorPages.styles.css" asp-append-version="true" />
+    <!-- Thêm Bootstrap CDN vào _Layout.cshtml -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MgrttK32DeSOVNuLL+lStMxyK5SnQeuUu78kMyzQiAxxuMAkj1H9jr/zXJ7+KkBy" crossorigin="anonymous">
+
+</head>
+<body>
+    <header class="bg-primary text-white text-center p-3">
+        <h1>FU News</h1>
+    </header>
+
+    <div class="container">
+        @RenderBody() <!-- Nội dung của các trang con sẽ được chèn vào đây -->
+    </div>
+
+    <footer class="bg-light text-center p-3 mt-5">
+        <p>&copy; @DateTime.Now.Year - Your Company</p>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

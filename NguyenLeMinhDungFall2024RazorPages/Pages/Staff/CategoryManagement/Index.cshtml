@@ -1,0 +1,76 @@
+﻿@page
+@model NguyenLeMinhDungFall2024RazorPages.Pages.Staff.CategoryManagement.IndexModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Category Management";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/NguyenLeMinhDungFall2024RazorPages.styles.css" asp-append-version="true" />
+    <!-- Thêm Bootstrap CDN vào _Layout.cshtml -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MgrttK32DeSOVNuLL+lStMxyK5SnQeuUu78kMyzQiAxxuMAkj1H9jr/zXJ7+KkBy" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Category Management</h2>
+                    <a href="/Logout" class="btn btn-outline-light">Logout</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>
+                    <a asp-page="Create" class="btn btn-success">Create New</a>
+                </p>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Category[0].CategoryName)</th>
+                                <th>@Html.DisplayNameFor(model => model.Category[0].CategoryDesciption)</th>
+                                <th>@Html.DisplayNameFor(model => model.Category[0].IsActive)</th>
+                                <th>@Html.DisplayNameFor(model => model.Category[0].ParentCategory)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Category)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.CategoryDesciption)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.IsActive)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.ParentCategory.CategoryDesciption)</td>
+                                    <td>
+                                        <a asp-page="./Edit" asp-route-id="@item.CategoryId" class="btn btn-primary btn-sm">Edit</a>
+                                        <a asp-page="./Details" asp-route-id="@item.CategoryId" class="btn btn-info btn-sm">Details</a>
+                                        <a asp-page="./Delete" asp-route-id="@item.CategoryId" class="btn btn-danger btn-sm">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="./Dashboard" class="btn btn-secondary">Back to previous page</a>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

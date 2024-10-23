@@ -1,0 +1,64 @@
+﻿<Window x:Class="NguyenLeMinhDung__SE1706_Fall2024_A01.Staff.UpdateCategory"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NguyenLeMinhDung__SE1706_Fall2024_A01.Staff"
+        mc:Ignorable="d"
+        Title="Update Category"
+        Height="380"
+        Width="400"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
+    <Grid Margin="20">
+        <StackPanel x:Name="UpdateCategoryView">
+            <TextBlock Text="Update Category"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"
+                       HorizontalAlignment="Center" />
+
+            <Label Content="Category ID:" />
+            <TextBox Name="txtCategoryId"
+                     Text="{Binding CategoryId}"
+                     HorizontalAlignment="Stretch"
+                     Margin="0,0,0,10"
+                     Height="30"
+                     Padding="5"
+                     IsReadOnly="True" />
+
+            <Label Content="Category Name:" />
+            <TextBox Name="txtCategoryName"
+                     Text="{Binding CategoryName}"
+                     HorizontalAlignment="Stretch"
+                     Margin="0,0,0,10"
+                     Height="30"
+                     Padding="5" />
+
+            <Label Content="Description:" />
+            <TextBox Name="txtDescription"
+                     Text="{Binding CategoryDesciption}"
+                     HorizontalAlignment="Stretch"
+                     Margin="0,0,0,10"
+                     Height="60"
+                     Padding="5"
+                     AcceptsReturn="True" />
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,10,0,0">
+                <Button Content="Update"
+                        Width="100"
+                        Click="btnUpdate_Click"
+                        Background="#2196F3"
+                        Foreground="White"
+                        Margin="0,0,5,0" />
+                <Button Content="Cancel"
+                        Width="100"
+                        Click="btnCancel_Click"
+                        Background="#F44336"
+                        Foreground="White" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

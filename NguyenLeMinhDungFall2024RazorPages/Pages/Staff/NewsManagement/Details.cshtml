@@ -1,0 +1,124 @@
+﻿@page
+@model NguyenLeMinhDungFall2024RazorPages.Pages.Staff.NewsManagement.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = null; // Disable the default layout
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        .container-custom {
+            margin-top: 2rem;
+        }
+
+        .details-header {
+            margin-bottom: 1rem;
+        }
+
+        .btn-back {
+            margin-bottom: 1rem;
+        }
+
+        .bordered-section {
+            border: 1px solid #dee2e6; /* Bootstrap's default border color */
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f8f9fa; /* Light background for sections */
+        }
+
+        dl {
+            margin-bottom: 0; /* Remove bottom margin from dl */
+        }
+
+        dt {
+            font-weight: bold; /* Bold for definition titles */
+        }
+
+        .tags-list {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: #e9ecef; /* Light background for tags section */
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container container-custom">
+        <!-- Back button -->
+        <a href="javascript:history.back()" class="btn btn-secondary btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Previous Page
+        </a>
+
+        <h1 class="details-header">News Article Details</h1>
+
+        <div class="bordered-section">
+            <h4>News Article Information</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">Title</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.NewsArticle.NewsTitle)</dd>
+                <dt class="col-sm-2">Headline</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.NewsArticle.Headline)</dd>
+                <dt class="col-sm-2">Created Date</dt>
+                <dd class="col-sm-10">Category</dd>
+                <dt class="col-sm-2">@Html.DisplayNameFor(model => model.NewsArticle.Category)</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.NewsArticle.Category.CategoryName)</dd>
+                <dt class="col-sm-2">Content</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.NewsArticle.NewsContent)</dd>
+                <dt class="col-sm-2">Source</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.NewsArticle.NewsSource)</dd>
+                <dt class="col-sm-2">Is Active</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.NewsArticle.NewsStatus)</dd>
+                <dt class="col-sm-2">Created By</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.NewsArticle.CreatedBy.AccountName)</dd>
+            </dl>
+        </div>
+
+        <!-- Tags Section -->
+        <div class="bordered-section tags-list">
+            <h4>Tags</h4>
+            <hr />
+            @if (Model.NewsArticle.Tags != null && Model.NewsArticle.Tags.Any())
+            {
+                <ul class="list-inline">
+                    @foreach (var tag in Model.NewsArticle.Tags)
+                    {
+                        <li class="list-inline-item">
+                            <span class="badge badge-secondary text-black">@tag.TagName</span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No tags available for this article.</p>
+            }
+        </div>
+
+        <div>
+            <a asp-page="./Edit" asp-route-id="@Model.NewsArticle.NewsArticleId" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a asp-page="./Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
