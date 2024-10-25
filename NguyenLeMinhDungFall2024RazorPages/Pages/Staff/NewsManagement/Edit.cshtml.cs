@@ -6,6 +6,8 @@ using BusinessObjects;
 using Repository.IRepository;
 using Repository.Repository;
 using System.Security.Claims;
+using DataAccessObjects;
+using Microsoft.AspNetCore.SignalR;
 
 namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.NewsManagement
 {
@@ -15,13 +17,16 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.NewsManagement
         private readonly ICategoryRepository categoryRepository;
         private readonly ISystemAccountRepository systemAccountRepository;
         private readonly ITagRepository tagRepository;
+        private readonly IHubContext<SignalRHub> hubContext;
 
-        public EditModel()
+        public EditModel(IHubContext<SignalRHub> hubContext)
         {
             newsArticleRepository = new NewsArticleRepository();
             categoryRepository = new CategoryRepository();
             systemAccountRepository = new SystemAccountRepository();
             tagRepository = new TagRepository();
+            this.hubContext = hubContext;
+
         }
 
         [BindProperty]
@@ -56,8 +61,7 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.NewsManagement
             SelectedTagIds = newsarticle.Tags.Select(t => t.TagId).ToList();
 
             ViewData["CategoryId"] = new SelectList(categoryRepository.GetCategories(), "CategoryId", "CategoryName");
-           ViewData["CreatedById"] = new SelectList(systemAccountRepository.GetSystemAccounts(), "AccountId", "AccountId");
-           ViewData["Tags"] = new SelectList(AvailableTags, "TagId", "TagName");
+            ViewData["CreatedById"] = new SelectList(systemAccountRepository.GetSystemAccounts(), "AccountId", "AccountId");
             return Page();
         }
 
@@ -77,17 +81,9 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.NewsManagement
                 NewsArticle.CreatedBy = currentNews.CreatedBy;
                 NewsArticle.CreatedById = currentNews.CreatedById;
                 NewsArticle.Category = categoryRepository.GetCategoryById(NewsArticle.CategoryId);
-                // Associate selected tags
-                List<Tag> tags = new List<Tag>();
-                foreach (var id in SelectedTagIds)
-                {
-                    Tag tag1 = tagRepository.GetTagById(id);
-                    tags.Add(tag1);
-                }
 
-                NewsArticle.Tags = tags;
 
-                newsArticleRepository.UpdateNewsArticle(NewsArticle, SelectedTagIds);
+                newsArticleRepository.UpdateNewsDelete(NewsArticle);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -100,6 +96,9 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.NewsManagement
                     throw;
                 }
             }
+
+            await hubContext.Clients.All.SendAsync("RefreshData");
+
 
             return RedirectToPage("./Index");
         }

@@ -27,5 +27,19 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.NewsManagement
         {
             NewsArticle = newsArticleRepository.GetNewsArticles();
         }
+        public async Task<IActionResult> OnPostDeleteAsync(int newsArticleId)
+        {
+            var newsArticle = newsArticleRepository.GetNewsArticleById(newsArticleId.ToString());
+            if (newsArticle == null)
+            {
+                return NotFound();
+            }
+
+            newsArticle.NewsStatus = false;
+            newsArticleRepository.UpdateNewsDelete(newsArticle);
+
+            // Sau khi xóa, tải lại dữ liệu để hiển thị danh sách cập nhật
+            return RedirectToPage();
+        }
     }
 }

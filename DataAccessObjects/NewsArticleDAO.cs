@@ -1,19 +1,14 @@
 ﻿using Azure;
 using BusinessObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DataAccessObjects
 {
     public class NewsArticleDAO
     {
         TagDAO tagDAO = new TagDAO();
+
         public static List<NewsArticle> GetNewsArticles()
         {
             var list = new List<NewsArticle>();
@@ -21,7 +16,6 @@ namespace DataAccessObjects
             {
                 using var context = new FunewsManagementFall2024Context();
                 list = context.NewsArticles
-                    .Where(n => n.NewsStatus == true)
                     .Include(n => n.Tags)
                     .Include(n => n.Category)
                     .Include(n => n.CreatedBy)
@@ -29,6 +23,21 @@ namespace DataAccessObjects
             }
             catch (Exception ex) { }
             return list;
+        }
+
+        public static void UpdateNewsDelete(NewsArticle newsArticle)
+        {
+            try
+            {
+                using var context = new FunewsManagementFall2024Context();
+                context.Entry<NewsArticle>(newsArticle).State
+                    = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public static NewsArticle GetNewsArticleById(string id)
@@ -46,8 +55,32 @@ namespace DataAccessObjects
             try
             {
                 using var context = new FunewsManagementFall2024Context();
-                context.NewsArticles.Add(newNewsArticle);
-                context.SaveChanges();
+
+                // Kiểm tra nếu NewsArticleId đã tồn tại
+                var existingArticle = context.NewsArticles
+                    .SingleOrDefault(a => a.NewsArticleId == newNewsArticle.NewsArticleId);
+
+                if (existingArticle != null)
+                {
+                    // Nếu tồn tại, có thể xóa hoặc cập nhật theo ý bạn
+                    // context.NewsArticles.Remove(existingArticle); // Nếu muốn xóa
+                    // context.SaveChanges(); // Nếu đã xóa
+                    // Hoặc cập nhật
+                    // existingArticle.Title = newNewsArticle.Title; // Cập nhật các thuộc tính khác
+                    // context.SaveChanges(); // Lưu thay đổi
+                }
+                else
+                {
+
+                    // Generate unique NewsArticleId
+                    var maxId = context.NewsArticles.Max(u => u.NewsArticleId) ?? "0"; // Handle null case
+                    int newId = int.Parse(maxId) + 1; // Generate new ID
+                    newNewsArticle.NewsArticleId = newId.ToString(); // Ensure it's stored as a numeric string
+                                                                     // Nếu không tồn tại, thêm mới
+                    context.Entry(newNewsArticle).State = EntityState.Added;
+
+                    context.SaveChanges();
+                }
             }
             catch (Exception ex)
             {
@@ -81,11 +114,6 @@ namespace DataAccessObjects
                 .Include(n => n.Tags)
                 .FirstOrDefault(n => n.NewsArticleId.Equals(updateNewsArticle.NewsArticleId));
 
-            if (newsArticleFromDB == null)
-            {
-                throw new Exception("Article not found");
-            }
-
             // Cập nhật thông tin bài viết
             newsArticleFromDB.NewsTitle = updateNewsArticle.NewsTitle;
             newsArticleFromDB.Headline = updateNewsArticle.Headline;
@@ -104,9 +132,6 @@ namespace DataAccessObjects
             {
                 newsArticleFromDB.Tags.Add(tag); // Thêm từng Tag mới
             }
-
-            // Cập nhật trạng thái của bài viết và các thay đổi liên quan đến Tags
-            _context.NewsArticles.Update(newsArticleFromDB);
 
             // Lưu các thay đổi vào cơ sở dữ liệu
             _context.SaveChangesAsync();
@@ -130,6 +155,8 @@ namespace DataAccessObjects
             using (var context = new FunewsManagementFall2024Context())
             {
                 return context.NewsArticles
+                    .Include(article => article.Tags)
+                    .Include(article => article.Category)
                     .Where(article => article.CreatedById == accountId)
                     .ToList();
             }
@@ -175,43 +202,43 @@ namespace DataAccessObjects
 
                 context.Attach(newsArticleFromDB).State = EntityState.Modified;
 
-                //// Remove tags that are not in the new tag list
-                //var tagsToRemove = newsArticleFromDB.Tags
-                //    .Where(t => !taglist.Any(tag => tag.TagId == t.TagId))
-                //    .ToList();
+                // Remove tags that are not in the new tag list
+                var tagsToRemove = newsArticleFromDB.Tags
+                    .Where(t => !taglist.Any(tag => tag.TagId == t.TagId))
+                    .ToList();
 
-                //// Add new tags that are not in the current list
-                //foreach (var tag in taglist)
-                //{
-                //    // Kiểm tra xem tag đã tồn tại trong danh sách Local của context hay chưa
-                //    var existingTag = context.Tags.Local.FirstOrDefault(t => t.TagId == tag.TagId);
+                // Add new tags that are not in the current list
+                foreach (var tag in taglist)
+                {
+                    // Kiểm tra xem tag đã tồn tại trong danh sách Local của context hay chưa
+                    var existingTag = context.Tags.Local.FirstOrDefault(t => t.TagId == tag.TagId);
 
-                //    if (existingTag == null)
-                //    {
-                //        // Tìm tag trong database mà không theo dõi (AsNoTracking)
-                //        existingTag = context.Tags.AsNoTracking().FirstOrDefault(t => t.TagId == tag.TagId);
+                    if (existingTag == null)
+                    {
+                        // Tìm tag trong database mà không theo dõi (AsNoTracking)
+                        existingTag = context.Tags.AsNoTracking().FirstOrDefault(t => t.TagId == tag.TagId);
 
-                //        if (existingTag != null)
-                //        {
-                //            // Gắn kết thực thể đã tìm thấy vào context
-                //            context.Attach(existingTag);
-                //        }
-                //    }
+                        if (existingTag != null)
+                        {
+                            // Gắn kết thực thể đã tìm thấy vào context
+                            context.Attach(existingTag);
+                        }
+                    }
 
-                //    if (existingTag != null)
-                //    {
-                //        // Nếu tag tồn tại, thêm nó vào newsArticleFromDB.Tags nếu chưa có
-                //        if (!newsArticleFromDB.Tags.Any(t => t.TagId == existingTag.TagId))
-                //        {
-                //            newsArticleFromDB.Tags.Add(existingTag);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        // Nếu tag không tồn tại trong database, thêm mới tag vào newsArticleFromDB.Tags
-                //        newsArticleFromDB.Tags.Add(tag);
-                //    }
-                //}
+                    if (existingTag != null)
+                    {
+                        // Nếu tag tồn tại, thêm nó vào newsArticleFromDB.Tags nếu chưa có
+                        if (!newsArticleFromDB.Tags.Any(t => t.TagId == existingTag.TagId))
+                        {
+                            newsArticleFromDB.Tags.Add(existingTag);
+                        }
+                    }
+                    else
+                    {
+                        // Nếu tag không tồn tại trong database, thêm mới tag vào newsArticleFromDB.Tags
+                        newsArticleFromDB.Tags.Add(tag);
+                    }
+                }
 
 
                 context.SaveChanges();
@@ -262,5 +289,81 @@ namespace DataAccessObjects
                 throw new Exception($"Error: {ex.Message}, Inner Exception: {innerException}");
             }
         }
+
+        public static void AddTag(NewsArticle currentArticle, List<int> SelectedTagIds)
+        {
+            try
+            {
+                using var funewsManagementFall2024Context = new FunewsManagementFall2024Context();
+
+                // Load current tags and their associations
+                var existingTags = funewsManagementFall2024Context.Tags
+                    .Include(n => n.NewsArticles)
+                    .Where(t => SelectedTagIds.Contains(t.TagId)).ToList();
+
+                // Clear current article's tags before adding new ones
+                currentArticle.Tags.Clear();
+
+                foreach (var tag in existingTags)
+                {
+                    // Add the tag to the article's tags collection if it's not already there
+                    if (!currentArticle.Tags.Contains(tag))
+                    {
+                        currentArticle.Tags.Add(tag);
+                        tag.NewsArticles.Add(currentArticle);
+                    }
+                }
+
+                // Mark the article as modified and save changes
+                funewsManagementFall2024Context.Entry(currentArticle).State = EntityState.Modified;
+                funewsManagementFall2024Context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static void RemoveTag(NewsArticle currentArticle, List<int> SelectedTagIds)
+        {
+            try
+            {
+                using var funewsManagementFall2024Context = new FunewsManagementFall2024Context();
+
+                // Lấy bài báo hiện tại từ cơ sở dữ liệu thay vì từ tham số
+                var trackedArticle = funewsManagementFall2024Context.NewsArticles
+                    .Include(n => n.Tags)
+                    .FirstOrDefault(a => a.NewsArticleId == currentArticle.NewsArticleId);
+
+                // Nếu không tìm thấy bài báo, trả về lỗi hoặc xử lý
+                if (trackedArticle == null)
+                {
+                    throw new Exception("Bài báo không tồn tại.");
+                }
+
+                // Lấy các thẻ hiện có
+                var existingTags = funewsManagementFall2024Context.Tags
+                    .Include(n => n.NewsArticles)
+                    .Where(t => SelectedTagIds.Contains(t.TagId)).ToList();
+
+                // Xóa các thẻ khỏi bài báo
+                foreach (var tag in existingTags)
+                {
+                    if (trackedArticle.Tags.Contains(tag))
+                    {
+                        trackedArticle.Tags.Remove(tag);
+                        tag.NewsArticles.Remove(trackedArticle);
+                    }
+                }
+
+                // Lưu các thay đổi vào cơ sở dữ liệu
+                funewsManagementFall2024Context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi xóa thẻ: {ex.Message}");
+            }
+        }
+
+
     }
 }

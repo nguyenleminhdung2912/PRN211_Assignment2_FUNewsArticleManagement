@@ -10,21 +10,16 @@ using BusinessObjects;
 using DataAccessObjects;
 using Repository.IRepository;
 using Repository.Repository;
-using Microsoft.AspNetCore.SignalR;
 
-namespace NguyenLeMinhDungFall2024RazorPages.Pages.Admin
+namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.ProfileManagement
 {
-    public class AdminEditUserModel : PageModel
+    public class EditProfileModel : PageModel
     {
         private readonly ISystemAccountRepository systemAccountRepository;
-        private readonly IHubContext<SignalRHub> hubContext;
 
-
-        public AdminEditUserModel(IHubContext<SignalRHub> hubContext)
+        public EditProfileModel()
         {
             systemAccountRepository = new SystemAccountRepository();
-            this.hubContext = hubContext;
-
         }
 
         [BindProperty]
@@ -37,7 +32,7 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Admin
                 return NotFound();
             }
 
-            SystemAccount systemaccount = systemAccountRepository.GetSystemAccountById(id);
+            var systemaccount = systemAccountRepository.GetSystemAccountById(id);
             if (systemaccount == null)
             {
                 return NotFound();
@@ -46,15 +41,23 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Admin
             return Page();
         }
 
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
             try
             {
-                systemAccountRepository.SaveAccount(SystemAccount);
+                var systemaccount = systemAccountRepository.GetSystemAccountById(SystemAccount.AccountId);
+                SystemAccount.AccountRole = systemaccount.AccountRole;
+                systemAccountRepository.UpdateAccount(SystemAccount);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (SystemAccountExists(SystemAccount.AccountId) == null)
+                if (!SystemAccountExists(SystemAccount.AccountId))
                 {
                     return NotFound();
                 }
@@ -64,14 +67,12 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Admin
                 }
             }
 
-            await hubContext.Clients.All.SendAsync("RefreshData");
-
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Profile");
         }
 
-        private SystemAccount SystemAccountExists(short id)
+        private bool SystemAccountExists(short id)
         {
-            return systemAccountRepository.GetSystemAccountById(id);
+            return systemAccountRepository.GetSystemAccountById(id) == null ? true : false;
         }
     }
 }

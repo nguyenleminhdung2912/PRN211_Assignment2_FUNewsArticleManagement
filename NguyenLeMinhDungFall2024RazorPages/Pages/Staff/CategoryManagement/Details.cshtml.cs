@@ -9,16 +9,21 @@ using BusinessObjects;
 using DataAccessObjects;
 using Repository.IRepository;
 using Repository.Repository;
+using Microsoft.AspNetCore.SignalR;
 
 namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.CategoryManagement
 {
     public class DetailsModel : PageModel
     {
         private readonly ICategoryRepository categoryRepository;
+        private readonly IHubContext<SignalRHub> hubContext;
 
-        public DetailsModel()
+
+        public DetailsModel(IHubContext<SignalRHub> hubContext)
         {
             categoryRepository = new CategoryRepository();
+            this.hubContext = hubContext;
+
         }
 
         public Category Category { get; set; } = default!;
@@ -39,6 +44,8 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.CategoryManagement
             {
                 Category = category;
             }
+            await hubContext.Clients.All.SendAsync("RefreshData");
+
             return Page();
         }
     }

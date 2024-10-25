@@ -26,5 +26,10 @@ namespace Repository.IRepository
         List<NewsArticle> GetNewsArticlesCreatedBy(short accountId);
         List<NewsArticle> GetNewsArticlesContainTitle(string search);
 
+        void UpdateNewsDelete(NewsArticle newsArticle);
+
+        void AddTag(NewsArticle updateNewsArticle, List<int> taglist);
+        void RemoveTag(NewsArticle currentArticle, List<int> SelectedTagIds);
+
     }
 }

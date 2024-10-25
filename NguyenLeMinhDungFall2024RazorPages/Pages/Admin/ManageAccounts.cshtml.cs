@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Repository.IRepository;
 using Repository.Repository;
@@ -12,13 +13,17 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Admin
     public class ManageAccountsModel : PageModel
     {
         private readonly ISystemAccountRepository systemAccountRepository;
+        private readonly IHubContext<SignalRHub> hubContext;
+
 
         [BindProperty(SupportsGet = true)]
         public string SearchTerm { get; set; }
 
-        public ManageAccountsModel()
+        public ManageAccountsModel(IHubContext<SignalRHub> hubContext)
         {
             systemAccountRepository = new SystemAccountRepository();
+            this.hubContext = hubContext;
+
         }
 
         public List<SystemAccount> Accounts { get; set; }
@@ -40,7 +45,7 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Admin
             }
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (AccountId > 0)
             {
@@ -50,6 +55,9 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Admin
                     systemAccountRepository.DeleteAccount(account);
                 }
             }
+
+            await hubContext.Clients.All.SendAsync("RefreshData");
+
             return RedirectToPage("/Admin/ManageAccounts"); // Redirect back to the ManageAccounts page
         }
     }

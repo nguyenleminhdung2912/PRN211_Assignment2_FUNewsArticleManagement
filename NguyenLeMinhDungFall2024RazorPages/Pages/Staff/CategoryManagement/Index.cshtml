@@ -14,10 +14,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/NguyenLeMinhDungFall2024RazorPages.styles.css" asp-append-version="true" />
-    <!-- Thêm Bootstrap CDN vào _Layout.cshtml -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MgrttK32DeSOVNuLL+lStMxyK5SnQeuUu78kMyzQiAxxuMAkj1H9jr/zXJ7+KkBy" crossorigin="anonymous">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.9/signalr.min.js"></script>
 </head>
 <body>
     <div class="container mt-4">
@@ -32,6 +29,20 @@
                 <p>
                     <a asp-page="Create" class="btn btn-success">Create New</a>
                 </p>
+                <div class="container mt-4">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <!-- Phần còn lại của nội dung trang -->
+                </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
                         <thead class="thead-dark">
@@ -50,11 +61,21 @@
                                     <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
                                     <td>@Html.DisplayFor(modelItem => item.CategoryDesciption)</td>
                                     <td>@Html.DisplayFor(modelItem => item.IsActive)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.ParentCategory.CategoryDesciption)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.ParentCategory.CategoryName)</td>
                                     <td>
                                         <a asp-page="./Edit" asp-route-id="@item.CategoryId" class="btn btn-primary btn-sm">Edit</a>
                                         <a asp-page="./Details" asp-route-id="@item.CategoryId" class="btn btn-info btn-sm">Details</a>
-                                        <a asp-page="./Delete" asp-route-id="@item.CategoryId" class="btn btn-danger btn-sm">Delete</a>
+                                        @if (item.IsActive == true)
+                                        {
+                                            <button class="btn btn-danger btn-sm" onclick="confirmDelete('@item.CategoryId')">Delete</button>
+                                        }
+                                        else
+                                        {
+                                            <form method="post" asp-page-handler="ReActivate" class="d-inline">
+                                                <input type="hidden" name="categoryId" value="@item.CategoryId" />
+                                                <button type="submit" class="btn btn-warning btn-sm">Re-activate</button>
+                                            </form>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -64,6 +85,10 @@
             </div>
         </div>
 
+        <form id="deleteForm" method="post" asp-page-handler="Delete" class="d-none">
+            <input type="hidden" id="deleteCategoryId" name="categoryId" />
+        </form>
+
         <div class="text-center mt-4">
             <a href="./Dashboard" class="btn btn-secondary">Back to previous page</a>
         </div>
@@ -71,6 +96,16 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        function confirmDelete(categoryId) {
+            if (confirm('Are you sure you want to delete this category?')) {
+                // Nếu người dùng xác nhận, đặt giá trị categoryId vào form ẩn và submit form
+                document.getElementById('deleteCategoryId').value = categoryId;
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
 </body>
 </html>

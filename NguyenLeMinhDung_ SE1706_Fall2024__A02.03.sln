@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NguyenLeMinhDungFall2024WPF", "NguyenLeMinhDung_ SE1706_Fall2024_A01\NguyenLeMinhDungFall2024WPF.csproj", "{DB0E8CD5-061E-4F89-8AC1-342D890503EC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessObjects", "BusinessObjects\BusinessObjects.csproj", "{3F69601A-6C7D-4770-BED3-45B35277EB53}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessObjects", "DataAccessObjects\DataAccessObjects.csproj", "{250484D5-4A41-4939-9632-3AAAF2959A61}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DB0E8CD5-061E-4F89-8AC1-342D890503EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB0E8CD5-061E-4F89-8AC1-342D890503EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB0E8CD5-061E-4F89-8AC1-342D890503EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB0E8CD5-061E-4F89-8AC1-342D890503EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3F69601A-6C7D-4770-BED3-45B35277EB53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3F69601A-6C7D-4770-BED3-45B35277EB53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F69601A-6C7D-4770-BED3-45B35277EB53}.Release|Any CPU.ActiveCfg = Release|Any CPU

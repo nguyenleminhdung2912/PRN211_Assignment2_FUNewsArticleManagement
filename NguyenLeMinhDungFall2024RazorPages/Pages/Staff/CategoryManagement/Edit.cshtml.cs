@@ -10,16 +10,21 @@ using BusinessObjects;
 using DataAccessObjects;
 using Repository.IRepository;
 using Repository.Repository;
+using Microsoft.AspNetCore.SignalR;
 
 namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.CategoryManagement
 {
     public class EditModel : PageModel
     {
         private readonly ICategoryRepository categoryRepository;
+        private readonly IHubContext<SignalRHub> hubContext;
 
-        public EditModel()
+
+        public EditModel(IHubContext<SignalRHub> hubContext)
         {
-            categoryRepository = new CategoryRepository();
+            categoryRepository = new CategoryRepository(); 
+            this.hubContext = hubContext;
+
         }
 
         [BindProperty]
@@ -32,13 +37,12 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.CategoryManagement
                 return NotFound();
             }
 
-            var category =  categoryRepository.GetCategoryById(id);
+            var category = categoryRepository.GetCategoryById(id);
             if (category == null)
             {
                 return NotFound();
             }
             Category = category;
-           ViewData["ParentCategoryId"] = new SelectList(categoryRepository.GetCategories(), "CategoryId", "CategoryDesciption");
             return Page();
         }
 
@@ -48,6 +52,10 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.CategoryManagement
         {
             try
             {
+                var category = categoryRepository.GetCategoryById(Category.CategoryId);
+                Category.ParentCategory = category.ParentCategory;
+                Category.ParentCategoryId = category.ParentCategoryId;
+                Category.IsActive = category.IsActive;
                 categoryRepository.UpdateCategory(Category);
             }
             catch (DbUpdateConcurrencyException)
@@ -61,6 +69,8 @@ namespace NguyenLeMinhDungFall2024RazorPages.Pages.Staff.CategoryManagement
                     throw;
                 }
             }
+
+            await hubContext.Clients.All.SendAsync("RefreshData");
 
             return RedirectToPage("./Index");
         }

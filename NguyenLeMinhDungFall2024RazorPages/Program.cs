@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using NguyenLeMinhDungFall2024RazorPages;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Login";  // Đường dẫn đến trang đăng nhập
+        options.AccessDeniedPath = "/Login";
     });
 
 var app = builder.Build();
@@ -35,5 +37,11 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 app.MapHub<SignalRHub>("/SignalRHub");
+
+app.MapGet("/", async context =>
+{
+    context.Response.Redirect("/Login"); 
+    await Task.CompletedTask;
+});
 
 app.Run();

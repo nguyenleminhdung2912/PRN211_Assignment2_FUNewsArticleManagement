@@ -11,6 +11,9 @@ namespace Repository.Repository
 {
     public class NewsArticleRepository : INewsArticleRepository
     {
+        public void AddTag(NewsArticle updateNewsArticle, List<int> taglist)
+                => NewsArticleDAO.AddTag(updateNewsArticle, taglist);
+
         public void CreateNewsArticleWithTags(NewsArticle newNewsArticle, List<Tag> taglist)
                  => NewsArticleDAO.CreateNewsArticleWithTags(newNewsArticle, taglist);
 
@@ -32,6 +35,9 @@ namespace Repository.Repository
         public List<NewsArticle> GetNewsArticlesCreatedBy(short accountId)
                 => NewsArticleDAO.GetNewsArticlesCreatedBy(accountId);
 
+        public void RemoveTag(NewsArticle currentArticle, List<int> SelectedTagIds)
+                => NewsArticleDAO.RemoveTag(currentArticle, SelectedTagIds);
+
         public void SaveNewsArticle(NewsArticle newNewsArticle)
                 => NewsArticleDAO.SaveNewsArticle(newNewsArticle);
 
@@ -42,5 +48,7 @@ namespace Repository.Repository
         public void UpdateNewsArticleWithTags(NewsArticle newNewsArticle, List<Tag> taglist)
                 => NewsArticleDAO.UpdateNewsArticleWithTags(newNewsArticle, taglist);
 
+        public void UpdateNewsDelete(NewsArticle newsArticle)
+        => NewsArticleDAO.UpdateNewsDelete(newsArticle);
     }
 }
