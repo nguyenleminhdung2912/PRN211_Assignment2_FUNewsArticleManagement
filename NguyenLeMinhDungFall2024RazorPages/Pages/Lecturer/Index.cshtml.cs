@@ -7,6 +7,8 @@ using Repository.Repository;
 
 namespace NguyenLeMinhDungFall2024RazorPages.Pages.Lecturer
 {
+    [Authorize(Roles = "Lecturer")]
+
     public class IndexModel : PageModel
     {
         private readonly INewsArticleRepository newsArticleRepository; // Thay bằng DbContext của bạn
